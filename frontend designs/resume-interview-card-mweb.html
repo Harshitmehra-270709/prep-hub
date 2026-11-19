@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!--
+  AccioJob Diwali Offer: Resume Interview card at ₹9 (MWeb)
+  ------------------------------------------------------------
+  Replaces the existing Resume Interview card during the Diwali offer (6–12 Nov).
+
+  Paste the <style>, the .dwr-card block and the <script> into your page,
+  in place of the current Resume Interview card. Everything is scoped under .dwr-.
+
+  Hook up:
+    - "Start for ₹9" button:  DiwaliResume.onStart = function () { /* go to checkout at ₹9 */ };
+      (or replace the <button data-dwr-start> with an <a href="…">)
+    - "See a sample report":  set the href on a[data-dwr-sample]
+  Animations (lights + waveform) stop automatically for users with reduced motion enabled.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resume Interview ₹9 Diwali Card (MWeb)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  .dwr-card, .dwr-card * { box-sizing: border-box; }
+  .dwr-card { font-family: Inter, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; position: relative; overflow: hidden; border: 2px solid #E9B23F; background: #0B1B3F; color: #FFFFFF; }
+  .dwr-card p, .dwr-card h3 { margin: 0; }
+  .dwr-lights { position: absolute; left: 0; right: 0; top: 0; display: flex; justify-content: space-around; align-items: flex-end; pointer-events: none; z-index: 1; }
+  .dwr-lights span { width: 6px; height: 6px; border-radius: 50%; animation: dwr-twinkle 1.6s ease-in-out infinite; }
+  .dwr-wave { display: flex; align-items: center; }
+  .dwr-wave span { flex: none; transform-origin: 50% 50%; animation: dwr-wave 1s ease-in-out infinite; }
+  .dwr-icon { flex: none; background: #FFC94D; display: flex; align-items: center; justify-content: center; }
+  .dwr-tag { align-self: flex-start; border-radius: 999px; background: rgba(255,182,39,.16); border: 1px solid rgba(255,201,77,.45); color: #FFC94D; font-weight: 800; letter-spacing: .08em; white-space: nowrap; }
+  .dwr-title { font-weight: 800; letter-spacing: -.02em; color: #FFFFFF; }
+  .dwr-quote { font-weight: 700; color: #FFE6A8; text-wrap: pretty; }
+  .dwr-desc { font-weight: 400; line-height: 1.55; color: #CBD5E1; text-wrap: pretty; }
+  .dwr-rec-label { font-weight: 800; letter-spacing: .1em; color: #FFC94D; }
+  .dwr-rec-text { font-weight: 500; line-height: 1.5; color: #CBD5E1; text-wrap: pretty; }
+  .dwr-start { display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 12px; background: #FFC94D; color: #0B1B3F; font-family: inherit; font-weight: 800; cursor: pointer; white-space: nowrap; box-shadow: 0 0 16px rgba(255,201,77,.5); transition: background .15s; }
+  .dwr-start:hover { background: #FFD66E; }
+  .dwr-start s { font-weight: 600; color: #7A5A12; text-decoration-thickness: 2px; }
+  .dwr-sample { display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; border: 1.5px solid rgba(255,255,255,.35); color: #FFFFFF; font-weight: 700; text-decoration: none; white-space: nowrap; transition: background .15s; }
+  .dwr-sample:hover { background: rgba(255,255,255,.06); color: #FFFFFF; text-decoration: none; }
+  .dwr-proof { display: inline-flex; align-items: center; border-radius: 999px; background: rgba(255,182,39,.14); color: #FFC94D; font-weight: 700; white-space: nowrap; }
+  @keyframes dwr-twinkle { 0%,100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.1); } }
+  @keyframes dwr-wave { 0%,100% { transform: scaleY(.55); } 50% { transform: scaleY(1); } }
+  @media (prefers-reduced-motion: reduce) { .dwr-lights span, .dwr-wave span { animation: none !important; } }
+  .dwr-mweb { border-radius: 18px; box-shadow: 0 12px 30px rgba(11,27,63,.3), 0 0 0 5px rgba(255,201,77,.16); }
+  .dwr-mweb .dwr-lights { height: 14px; padding: 0 10px; }
+  .dwr-mweb .dwr-top { padding: 24px 16px 16px; display: flex; align-items: center; gap: 14px; background: radial-gradient(circle at 15% 20%, rgba(255,182,39,.28), rgba(255,182,39,0) 60%), #0E2250; border-bottom: 1px solid rgba(255,201,77,.25); }
+  .dwr-mweb .dwr-icon { width: 40px; height: 40px; border-radius: 11px; box-shadow: 0 0 16px rgba(255,201,77,.45); }
+  .dwr-mweb .dwr-wave { flex: 1; height: 36px; gap: 4px; }
+  .dwr-mweb .dwr-wave span { width: 12px; border-radius: 12px; }
+  .dwr-mweb .dwr-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; background: radial-gradient(circle at 100% 0%, rgba(255,182,39,.2), rgba(255,182,39,0) 45%); }
+  .dwr-mweb .dwr-head { display: flex; flex-direction: column; gap: 8px; }
+  .dwr-mweb .dwr-tag { padding: 4px 9px; font-size: 9px; }
+  .dwr-mweb .dwr-title { font-size: 18px; letter-spacing: -.01em; }
+  .dwr-mweb .dwr-quote { font-size: 14px; line-height: 1.4; }
+  .dwr-mweb .dwr-desc { font-size: 12px; }
+  .dwr-mweb .dwr-rec { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,201,77,.2); }
+  .dwr-mweb .dwr-rec-label { font-size: 10px; }
+  .dwr-mweb .dwr-rec-text { font-size: 11px; }
+  .dwr-mweb .dwr-actions { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+  .dwr-mweb .dwr-start { width: 100%; height: 44px; gap: 8px; font-size: 14px; }
+  .dwr-mweb .dwr-start .dwr-price { font-size: 17px; }
+  .dwr-mweb .dwr-sample { width: 100%; height: 40px; font-size: 12px; }
+  .dwr-mweb .dwr-proof { align-self: center; padding: 6px 10px; font-size: 10px; }
+</style>
+</head>
+<body style="margin:0;padding:16px;background:#F6F8FB">
+
+<div class="dwr-card dwr-mweb">
+  <div class="dwr-lights" aria-hidden="true"></div>
+  <div class="dwr-top">
+    <span class="dwr-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0B1B3F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg></span>
+    <div class="dwr-wave" aria-hidden="true"></div>
+  </div>
+  <div class="dwr-body">
+    <div class="dwr-head">
+      <span class="dwr-tag">DIWALI SPECIAL · 6–12 NOV</span>
+      <h3 class="dwr-title">Resume Interview</h3>
+    </div>
+    <p class="dwr-quote">"Can I defend my resume under pressure in front of an interviewer?"</p>
+    <p class="dwr-desc">A 15-minute AI interview on your own resume, and a report on what to fix - filler words, pacing, weak answers.</p>
+    <div class="dwr-rec">
+      <span class="dwr-rec-label">HIGHLY RECOMMENDED</span>
+      <p class="dwr-rec-text">One thing every student should practice if you are seriously looking for a job.</p>
+    </div>
+    <div class="dwr-actions">
+      <button class="dwr-start" type="button" data-dwr-start aria-label="Start for ₹9, was ₹49"><span>Start for</span><s>₹49</s><span class="dwr-price">₹9</span><span>→</span></button>
+      <a class="dwr-sample" href="#" data-dwr-sample>See a sample report</a>
+      <span class="dwr-proof">🚀 433 AI interviews taken in the last 3 weeks.</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var LIGHT_COLS = ['#FFC94D', '#FF8A00', '#FF4D6D', '#7CF3C5', '#FFE08A'];
+  var BARS = [0.3, 0.6, 1, 0.55, 0.35, 0.85, 0.3, 0.6, 1, 0.45, 0.65, 0.3];
+  var BAR_COLS = ['#FFE08A', '#FFC94D', '#FF8A00', '#FFC94D', '#FFE08A', '#FF8A00'];
+  document.querySelectorAll('.dwr-card').forEach(function (card) {
+    var l = card.querySelector('.dwr-lights'), w = card.querySelector('.dwr-wave');
+    if (l && !l.children.length) l.innerHTML = Array.from({ length: 14 }, function (_, i) {
+      var c = LIGHT_COLS[i % 5];
+      return '<span style="background:' + c + ';box-shadow:0 0 8px 2px ' + c + ';animation-duration:' + (1.4 + (i % 4) * 0.3) + 's;animation-delay:' + ((i % 6) * 0.2) + 's;margin-top:' + (i % 2 ? 3 : 9) + 'px"></span>';
+    }).join('');
+    if (w && !w.children.length) w.innerHTML = BARS.map(function (b, i) {
+      var anim = b > 0.32 ? 'animation-duration:' + (0.9 + (i % 3) * 0.25) + 's;animation-delay:' + ((i % 5) * 0.12) + 's;' : 'animation:none;';
+      return '<span style="height:' + Math.max(12, b * 36) + 'px;background:' + BAR_COLS[i % 6] + ';opacity:' + (0.6 + b * 0.4) + ';' + anim + '"></span>';
+    }).join('');
+    var btn = card.querySelector('[data-dwr-start]');
+    if (btn) btn.addEventListener('click', function () { if (typeof window.DiwaliResume === 'object' && typeof DiwaliResume.onStart === 'function') DiwaliResume.onStart(); });
+  });
+  window.DiwaliResume = window.DiwaliResume || { onStart: null };
+})();
+</script>
+</body>
+</html>

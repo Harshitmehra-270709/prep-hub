@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<!--
+  AccioJob Diwali Offer: Claimed role card restyle (Web + MWeb)
+  ------------------------------------------------------------
+  Turns the claimed role's card on your page into the Diwali-themed card
+  with a "Start Test" button. Web sizes by default; MWeb sizes below 768px.
+
+  Paste the <style> and <script> into your page (just before </body>).
+
+  1. Mark each role card on the page with its role id:
+       <div data-diwali-role="backend">…</div>
+     ids: backend, fullstack, frontend, data-analyst, data-scientist, data-engineer, qa
+
+  2. Apply the theme:
+       DiwaliCard.apply('backend');
+     The claim pop-up calls this automatically after a claim (and on return visits).
+
+  3. Hook "Start Test":
+       DiwaliCard.onStartTest = function (roleId) { /* go to the test */ };
+     If not set, it falls back to DiwaliClaim.onStartTest.
+
+  DiwaliCard.restore('backend') puts the original card content back.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diwali Claimed Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @keyframes dw-twinkle { 0%,100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.1); } }
+  .dw-card .dw-light { width: 6px; height: 6px; border-radius: 50%; animation-name: dw-twinkle; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+  .dw-card .dw-lights { position: absolute; left: 0; right: 0; display: flex; justify-content: space-around; align-items: flex-end; padding: 0 10px; pointer-events: none; }
+  .dw-card { position: relative !important; overflow: hidden !important; border-radius: 18px !important; border: 2px solid #E9B23F !important; background: radial-gradient(circle at 92% 0%, rgba(255,182,39,.32), rgba(255,182,39,0) 45%), #0B1B3F !important; box-shadow: 0 14px 40px rgba(11,27,63,.32), 0 0 0 5px rgba(255,201,77,.18) !important; padding: 26px 24px 22px !important; display: flex !important; flex-direction: column !important; gap: 18px !important; font-family: Inter, system-ui, sans-serif; color: #FFFFFF; }
+  .dw-card, .dw-card * { box-sizing: border-box; }
+  .dw-card .dw-lights { top: 0; height: 16px; }
+  .dw-card-head { display: flex; gap: 14px; align-items: flex-start; }
+  .dw-card-icon { flex: none; width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #FFFFFF; box-shadow: 0 0 0 3px rgba(255,201,77,.35); }
+  .dw-card-titles { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .dw-card-name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 20px; font-weight: 700; color: #FFFFFF; letter-spacing: -.01em; }
+  .dw-card-free { padding: 3px 9px; border-radius: 999px; background: #FFC94D; color: #0B1B3F; font-size: 11px; font-weight: 800; letter-spacing: .06em; }
+  .dw-card-sub { font-size: 16px; font-weight: 600; color: #FFC94D; }
+  .dw-card-chips { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+  .dw-card-chip { padding: 7px 13px; border-radius: 999px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,201,77,.4); color: #FFE6A8; font-size: 14px; font-weight: 600; }
+  .dw-card-more { color: #94A3B8; font-size: 14px; font-weight: 600; }
+  .dw-card-foot { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+  .dw-card-metas { display: flex; flex-direction: column; gap: 6px; }
+  .dw-card-meta { font-size: 14px; font-weight: 600; color: #FFE6A8; }
+  .dw-card-skills { font-size: 14px; font-weight: 600; color: #CBD5E1; }
+  .dw-card-start { flex: none; height: 44px; padding: 0 20px; border: none; border-radius: 12px; background: #FFC94D; color: #0B1B3F; font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer; box-shadow: 0 0 16px rgba(255,201,77,.5); }
+  .dw-card-start:hover { background: #FFD66E; }
+
+  @media (max-width: 767px) {
+    .dw-card { position: relative !important; overflow: hidden !important; border-radius: 16px !important; border: 2px solid #E9B23F !important; background: radial-gradient(circle at 92% 0%, rgba(255,182,39,.32), rgba(255,182,39,0) 45%), #0B1B3F !important; box-shadow: 0 14px 40px rgba(11,27,63,.32), 0 0 0 5px rgba(255,201,77,.18) !important; padding: 22px 16px 16px !important; display: flex !important; flex-direction: column !important; gap: 14px !important; font-family: Inter, system-ui, sans-serif; color: #FFFFFF; }
+    .dw-card, .dw-card * { box-sizing: border-box; }
+    .dw-card .dw-lights { top: 0; height: 14px; }
+    .dw-card-head { display: flex; gap: 14px; align-items: flex-start; }
+    .dw-card-icon { flex: none; width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; color: #FFFFFF; box-shadow: 0 0 0 3px rgba(255,201,77,.35); }
+    .dw-card-titles { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+    .dw-card-name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; font-weight: 700; color: #FFFFFF; letter-spacing: -.01em; }
+    .dw-card-free { padding: 3px 9px; border-radius: 999px; background: #FFC94D; color: #0B1B3F; font-size: 9px; font-weight: 800; letter-spacing: .06em; }
+    .dw-card-sub { font-size: 12px; font-weight: 600; color: #FFC94D; }
+    .dw-card-chips { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; }
+    .dw-card-chip { padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,201,77,.4); color: #FFE6A8; font-size: 11px; font-weight: 600; }
+    .dw-card-more { color: #94A3B8; font-size: 11px; font-weight: 600; }
+    .dw-card-foot { margin-top: auto; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+    .dw-card-metas { display: flex; flex-direction: column; gap: 6px; }
+    .dw-card-meta { font-size: 11px; font-weight: 600; color: #FFE6A8; }
+    .dw-card-skills { font-size: 11px; font-weight: 600; color: #CBD5E1; }
+    .dw-card-start { flex: none; height: 40px; padding: 0 16px; border: none; border-radius: 12px; background: #FFC94D; color: #0B1B3F; font-family: inherit; font-size: 12px; font-weight: 800; cursor: pointer; box-shadow: 0 0 16px rgba(255,201,77,.5); }
+    .dw-card-start:hover { background: #FFD66E; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:24px;background:#F6F8FB;font-family:Inter,sans-serif">
+
+<!-- DEMO ONLY: a sample card so you can preview this file. Remove when integrating. -->
+<div data-diwali-role="backend" style="max-width:506px;min-height:300px;padding:24px;border-radius:16px;border:1px solid #CDEFE3;background:#EEFBF6">Original Backend Developer card</div>
+
+<script>
+(function () {
+  var ROLES = [
+    { id: 'backend', name: 'Backend Developer', color: '#12A089', icon: 'server', skills: 5, chips: ['Core Java', 'DBMS', 'DSA'], more: '+2 more', meta: 'Java or Python' },
+    { id: 'fullstack', name: 'Full-Stack Developer', color: '#2F7FEA', icon: 'layers', skills: 6, chips: ['Core Java', 'Spring & REST APIs', 'DBMS'], more: '+3 more', meta: 'Java or MERN' },
+    { id: 'frontend', name: 'Frontend Developer', color: '#7C3AED', icon: 'layout', skills: 6, chips: ['HTML & CSS', 'JavaScript & ES6+', 'React'], more: '+3 more', meta: '' },
+    { id: 'data-analyst', name: 'Data Analyst', color: '#16A34A', icon: 'chart', skills: 5, chips: ['Excel', 'SQL', 'Power BI'], more: '+2 more', meta: '' },
+    { id: 'data-scientist', name: 'Data Scientist', color: '#4F46E5', icon: 'brain', skills: 6, chips: ['Python', 'Statistics', 'Machine Learning'], more: '+3 more', meta: '' },
+    { id: 'data-engineer', name: 'Data Engineer', color: '#475569', icon: 'db', skills: 5, chips: ['Python', 'SQL & Data Modeling', 'Big Data (Spark)'], more: '+2 more', meta: '' },
+    { id: 'qa', name: 'QA Engineer', color: '#D97706', icon: 'bug', skills: 5, chips: ['Testing Fundamentals', 'Test Case Design', 'SQL'], more: '+2 more', meta: 'Manual or Automation' }
+  ];
+  var ICONS = {
+    server: 'M4 5h16v5H4zM4 14h16v5H4zM8 7.5h.01M8 16.5h.01',
+    layers: 'M12 3l9 5-9 5-9-5zM3 13l9 5 9-5',
+    layout: 'M4 4h16v7H4zM4 15h7v5H4zM15 15h5v5h-5z',
+    chart: 'M5 20V10M10 20V5M15 20v-8M20 20H3',
+    brain: 'M9 4a3 3 0 00-3 3 3 3 0 00-2 5 3 3 0 002 5 3 3 0 006 0V7a3 3 0 00-3-3zM15 4a3 3 0 013 3 3 3 0 012 5 3 3 0 01-2 5 3 3 0 01-6 0',
+    db: 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3',
+    bug: 'M8 9h8v6a4 4 0 01-8 0zM9 9a3 3 0 016 0M4 13h4M16 13h4M5 8l3 2M19 8l-3 2M5 19l3-2M19 19l-3-2'
+  };
+  function svgIcon(k, s) { return '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="' + ICONS[k] + '"/></svg>'; }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var LIGHT_COLS = ['#FFC94D', '#FF8A00', '#FF4D6D', '#7CF3C5', '#FFE08A'];
+  function lightsHTML(n) {
+    var out = '';
+    for (var i = 0; i < n; i++) {
+      var c = LIGHT_COLS[i % 5];
+      out += '<span class="dw-light" style="background:' + c + ';box-shadow:0 0 8px 2px ' + c + ';animation-duration:' + (1.4 + (i % 4) * 0.3) + 's;animation-delay:' + ((i % 6) * 0.2) + 's;margin-top:' + (i % 2 ? 3 : 9) + 'px"></span>';
+    }
+    return out;
+  }
+  var SELECTOR = '[data-diwali-role="{id}"]';
+  var mob = function () { return window.matchMedia('(max-width: 767px)').matches; };
+
+  function find(id) { return document.querySelector(SELECTOR.replace('{id}', id)); }
+
+  function apply(id) {
+    var role = ROLES.find(function (r) { return r.id === id; });
+    var el = find(id);
+    if (!role || !el || el.classList.contains('dw-card')) return;
+    el.setAttribute('data-dw-original', el.innerHTML);
+    el.classList.add('dw-card');
+    var ico = mob() ? 18 : 26;
+    el.innerHTML =
+      '<div class="dw-lights">' + lightsHTML(mob() ? 14 : 16) + '</div>' +
+      '<div class="dw-card-head"><span class="dw-card-icon" style="background:' + role.color + '">' + svgIcon(role.icon, ico) + '</span>' +
+      '<div class="dw-card-titles"><div class="dw-card-name">' + esc(role.name) + ' <span class="dw-card-free">FREE</span></div>' +
+      '<div class="dw-card-sub">Am I ready for ' + esc(role.name) + '?</div></div></div>' +
+      '<div class="dw-card-chips">' + role.chips.map(function (c) { return '<span class="dw-card-chip">' + esc(c) + '</span>'; }).join('') + '<span class="dw-card-more">' + role.more + '</span></div>' +
+      '<div class="dw-card-foot"><div class="dw-card-metas">' + (role.meta ? '<span class="dw-card-meta">' + esc(role.meta) + '</span>' : '') +
+      '<span class="dw-card-skills">' + role.skills + ' skills tested</span></div>' +
+      '<button type="button" class="dw-card-start">Start Test</button></div>';
+    el.querySelector('.dw-card-start').addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      var fn = API.onStartTest || (window.DiwaliClaim && window.DiwaliClaim.onStartTest);
+      if (typeof fn === 'function') fn(role.id, role);
+    });
+  }
+
+  function restore(id) {
+    var el = find(id); if (!el || !el.classList.contains('dw-card')) return;
+    el.innerHTML = el.getAttribute('data-dw-original') || '';
+    el.removeAttribute('data-dw-original');
+    el.classList.remove('dw-card');
+  }
+
+  var API = window.DiwaliCard = { apply: apply, restore: restore, onStartTest: null };
+})();
+</script>
+<!-- DEMO ONLY: applies the theme on load. Remove when integrating. -->
+<script>DiwaliCard.apply('backend');</script>
+</body>
+</html>

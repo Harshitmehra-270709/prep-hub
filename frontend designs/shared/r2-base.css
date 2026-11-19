@@ -1,0 +1,47 @@
+/* India AI Open · Round 2 — shared base styles (prefix: r2x-)
+   Used by: four-steps-*.html, cash-prizes-*.html. Load once per page. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@800;900&display=swap');
+
+.r2x-section{display:flex;justify-content:center;background:#F6F7FB;font-family:'Inter',system-ui,sans-serif;color:#0F1B33;-webkit-font-smoothing:antialiased}
+.r2x-section,.r2x-section *{box-sizing:border-box}
+.r2x-section[hidden]{display:none!important}
+.r2x-inner{width:100%;max-width:1100px;display:flex;flex-direction:column}
+.r2x-inner--m{max-width:none}
+
+/* Section marker squares */
+.r2x-marker{width:14px;height:14px}
+.r2x-marker--m{width:12px;height:12px}
+.r2x-red{background:#FF4B3E}.r2x-yellow{background:#FFC700}.r2x-green{background:#22B357}.r2x-pink{background:#E02A9A}
+
+/* Display headline */
+.r2x-h2{margin:10px 0 0;font-family:'Inter Tight',sans-serif;font-weight:900;font-size:clamp(44px,7vw,84px);line-height:.95;letter-spacing:-.055em;text-wrap:pretty}
+.r2x-h2--m{margin-top:8px;font-size:46px}
+
+/* Cards */
+.r2x-card{display:flex;flex-direction:column;background:#fff;border:1px solid #E3E6EE}
+.r2x-card--blue{background:#1F5EF5;border:0}
+
+/* Numerals & amounts */
+.r2x-num{font-family:'Inter Tight',sans-serif;font-weight:900;letter-spacing:-.03em;line-height:1;color:#1F5EF5}
+.r2x-num--gold{color:#FFC700}
+.r2x-amt{font-family:'Inter Tight',sans-serif;font-weight:900;letter-spacing:-.05em;line-height:1}
+.r2x-each{font-family:'Inter',sans-serif;font-weight:500;letter-spacing:0;color:#5A6478}
+.r2x-emoji{line-height:1}
+.r2x-muted{color:#5A6478}
+
+/* AIR pills */
+.r2x-pill{border-radius:999px;padding:4px 10px;font-size:13px;font-weight:600}
+.r2x-pill--gold{background:#FFC700;color:#0F1B33}
+.r2x-pill--blue{background:#E8EEFE;color:#1F5EF5}
+
+/* Tier label (AIR 4–5 etc.) */
+.r2x-tier{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;letter-spacing:.14em;color:#5A6478}
+.r2x-tier-sq{width:10px;height:10px;flex:none}
+
+/* Yellow prize strip */
+.r2x-strip{background:#FFF6D1;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.r2x-strip-emoji{font-size:22px;line-height:1}
+.r2x-strip-text{font-size:14px;font-weight:600;line-height:1.35;color:#0F1B33}
+
+/* Reduced motion: these components ship no animation; this guards any the site adds later. */
+@media (prefers-reduced-motion:reduce){.r2x-section,.r2x-section *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

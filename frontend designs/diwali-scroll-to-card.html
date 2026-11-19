@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<!--
+  AccioJob Diwali Offer: Scroll to claimed card (Web + MWeb)
+  ------------------------------------------------------------
+  Smoothly scrolls the page so the claimed role's card sits in the middle of the screen.
+
+  Paste the <script> into your page (just before </body>).
+
+  Role cards need data-diwali-role="<id>":
+    backend, fullstack, frontend, data-analyst, data-scientist, data-engineer, qa
+
+  Usage:
+    DiwaliScroll.toRole('backend');
+  The claim pop-up calls this automatically when it closes after a claim.
+
+  If your site has a sticky header, set DiwaliScroll.offset to its height in px.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diwali Scroll to Card</title>
+</head>
+<body style="margin:0;padding:24px;background:#F6F8FB;font-family:Inter,system-ui,sans-serif">
+
+<!-- DEMO ONLY: sample cards so you can preview this file. Remove when integrating. -->
+<div style="display:flex;flex-direction:column;gap:16px;max-width:506px">
+  <div data-diwali-role="backend" style="height:280px;border-radius:16px;background:#EEFBF6;padding:20px">Backend Developer</div>
+  <div data-diwali-role="fullstack" style="height:280px;border-radius:16px;background:#F0F6FF;padding:20px">Full-Stack Developer</div>
+  <div data-diwali-role="frontend" style="height:280px;border-radius:16px;background:#F6F3FF;padding:20px">Frontend Developer</div>
+  <div data-diwali-role="data-analyst" style="height:280px;border-radius:16px;background:#EEFBF2;padding:20px">Data Analyst</div>
+  <div data-diwali-role="data-scientist" style="height:280px;border-radius:16px;background:#F0F2FF;padding:20px">Data Scientist</div>
+  <div data-diwali-role="data-engineer" style="height:280px;border-radius:16px;background:#FFFFFF;padding:20px">Data Engineer</div>
+  <div data-diwali-role="qa" style="height:280px;border-radius:16px;background:#FFFAEB;padding:20px">QA Engineer</div>
+</div>
+
+<script>
+(function () {
+  var SELECTOR = '[data-diwali-role="{id}"]';
+
+  function toRole(id, delay) {
+    setTimeout(function () {
+      var el = document.querySelector(SELECTOR.replace('{id}', id)); if (!el) return;
+      var top = el.getBoundingClientRect().top + window.scrollY;
+      var free = window.innerHeight - API.offset - el.offsetHeight;
+      var y = top - API.offset - Math.max(16, free / 2);
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top: Math.max(0, y), behavior: reduce ? 'auto' : 'smooth' });
+    }, delay == null ? 120 : delay);
+  }
+
+  var API = window.DiwaliScroll = { toRole: toRole, offset: 0 };
+})();
+</script>
+<!-- DEMO ONLY: scrolls to the QA card on load. Remove when integrating. -->
+<script>DiwaliScroll.toRole('qa', 800);</script>
+</body>
+</html>

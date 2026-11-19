@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<!--
+  COMPONENT : Four steps (mweb)
+  WHAT      : The "Four steps." section, stacked cards, with the Round 2 cash-prize strip on step 03. Designed at 390px wide.
+  WHERE     : India AI Open mobile web, replacing the existing "Four steps." section (≤ 760px).
+  FILES     : this file + shared/r2-base.css + shared/r2-core.js (load the two shared files once per page).
+  PASTE     : 1) <link rel="stylesheet" href="shared/r2-base.css"> in <head>
+              2) the "Component CSS" block below into your stylesheet
+              3) the <section data-r2-root="four-steps-mweb"> … </section> markup
+              4) <script src="shared/r2-core.js"> once, then the "Component JS" block
+  CLASS PREFIXES : shared r2x-  ·  this component r2fsm-
+
+  JS API (window.R2FourStepsMweb)
+    .open() / .show()        show the section
+    .close() / .hide()       hide the section
+    .isOpen()                boolean
+    .set({field: 'text'})    override any placeholder (see FIELDS)
+    .onView   = fn(api)      fires once when 35% of the section scrolls into view (analytics)
+    .onShow   = fn(api)      after .open()
+    .onHide   = fn(api)      after .close()
+    .onAction = fn(name, el, event)   click on any [data-r2-action] inside the section
+                                      (none in the current design; add data-r2-action="register" etc. to future CTAs/links;
+                                       data-r2-action="close" also hides the section)
+
+  CONFIG (top of the component script, all off by default)
+    ENABLE_DATE_WINDOW  false   show only between SHOW_FROM and SHOW_UNTIL (ISO dates, IST)
+    SHOW_FROM / SHOW_UNTIL      date window bounds
+    DISMISS_WITH_ESC    false   Esc hides the section (only useful if you turn this into an overlay)
+    VALUES              null    object of field overrides applied on load (same keys as .set)
+
+  FIELDS (backend placeholders, data-r2-field="…"; defaults = current design copy)
+    round1Dates      "12–13 Dec"
+    round2Dates      "21–26 Dec"
+    resultsDate      "11 Jan"
+    prizeStrip       "AIR 1–20 win ₹1.2 lakh in cash prizes"
+    maxSalary        "₹50 LPA"
+    maxStipend       "₹1L/month"
+
+  HOOKS (data attributes)
+    data-r2-root="four-steps-mweb"   component root (query this)
+    data-r2-field="…"        backend-overridable text
+    data-r2-action="…"       click hook routed to .onAction (add to CTAs / links / close buttons)
+
+  ACCESSIBILITY
+    <section> is labelled by its <h2>; emoji and colour squares are aria-hidden; prize cards carry aria-labels.
+    No animation ships; shared CSS disables animation/transition under prefers-reduced-motion.
+    Emoji render with the device's emoji font, so they look slightly different per OS.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Four steps — mweb</title>
+<link rel="stylesheet" href="shared/r2-base.css">
+<style>
+/* Demo page only — your site already provides this. */
+body{margin:0;background:#F6F7FB}
+/* ===== Component CSS (copy from here) ===== */
+.r2fsm-section{padding:56px 20px 0}
+.r2fsm-grid{display:flex;flex-direction:column;gap:12px;margin-top:28px}
+.r2fsm-card{border-radius:16px;padding:20px;gap:10px}
+.r2fsm-num{font-size:30px}
+.r2fsm-title{margin:0;font-size:18px;font-weight:700;line-height:1.3}
+.r2fsm-text{margin:0;font-size:15px;line-height:1.55;color:#5A6478}
+.r2fsm-title--inv{color:#fff}
+.r2fsm-text--inv{color:#E6EDFF}
+.r2fsm-strip{margin-top:4px}
+/* ===== end component CSS ===== */
+</style>
+</head>
+<body>
+<section class="r2x-section r2fsm-section" data-r2-root="four-steps-mweb" aria-labelledby="r2fsm-h">
+  <div class="r2x-inner r2x-inner--m">
+    <div class="r2x-marker r2x-marker--m r2x-red" aria-hidden="true"></div>
+    <h2 id="r2fsm-h" class="r2x-h2 r2x-h2--m">Four steps.</h2>
+    <div class="r2fsm-grid" role="list">
+      <div class="r2x-card r2fsm-card" role="listitem">
+        <span class="r2x-num r2fsm-num" aria-hidden="true">01</span>
+        <h3 class="r2fsm-title">Pick a track and level</h3>
+        <p class="r2fsm-text">Choose the role you want, and your level: Build or Scale.</p>
+      </div>
+      <div class="r2x-card r2fsm-card" role="listitem">
+        <span class="r2x-num r2fsm-num" aria-hidden="true">02</span>
+        <h3 class="r2fsm-title">Round 1: Test and interview on fundamentals</h3>
+        <p class="r2fsm-text"><span data-r2-field="round1Dates">12–13 Dec</span>. Both cover the fundamentals of your track, set for your level. The interview is run by AI.</p>
+      </div>
+      <div class="r2x-card r2fsm-card r2fsm-card--prize" role="listitem">
+        <span class="r2x-num r2fsm-num" aria-hidden="true">03</span>
+        <h3 class="r2fsm-title">Round 2: Build an AI-first working solution</h3>
+        <p class="r2fsm-text"><span data-r2-field="round2Dates">21–26 Dec</span>. Use any AI tools, submit a repo or doc and a live link, then walk us through it.</p>
+        <div class="r2x-strip r2fsm-strip">
+          <span class="r2x-strip-emoji" aria-hidden="true">🏆</span>
+          <span class="r2x-strip-text" data-r2-field="prizeStrip">AIR 1–20 win ₹1.2 lakh in cash prizes</span>
+        </div>
+      </div>
+      <div class="r2x-card r2x-card--blue r2fsm-card" role="listitem">
+        <span class="r2x-num r2x-num--gold r2fsm-num" aria-hidden="true">04</span>
+        <h3 class="r2fsm-title r2fsm-title--inv">Get hired</h3>
+        <p class="r2fsm-text r2fsm-text--inv">Final results on <span data-r2-field="resultsDate">11 Jan</span>. If you’re shortlisted, apply to roles on any track with the same submission: full-time roles up to <span data-r2-field="maxSalary">₹50 LPA</span> and internships up to <span data-r2-field="maxStipend">₹1L/month</span>. Companies see your proof report and decide.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="shared/r2-core.js"></script>
+<script>
+/* ===== Component JS (copy from here) ===== */
+(function () {
+  var CONFIG = {
+    ENABLE_DATE_WINDOW: false,                     // true = only show between SHOW_FROM and SHOW_UNTIL
+    SHOW_FROM: '2026-11-09T00:00:00+05:30',        // registrations open
+    SHOW_UNTIL: '2027-01-11T23:59:59+05:30',       // final results
+    DISMISS_WITH_ESC: false,                       // inline section, so Esc does nothing by default
+    VALUES: null                                   // backend overrides, e.g. { prizeStrip: 'AIR 1–20 win ₹1.2 lakh in cash prizes' }
+  };
+  var root = document.querySelector('[data-r2-root="four-steps-mweb"]');
+  if (root && window.R2Core) R2Core.create('R2FourStepsMweb', root, CONFIG);
+})();
+/* ===== end component JS ===== */
+</script>
+</body>
+</html>

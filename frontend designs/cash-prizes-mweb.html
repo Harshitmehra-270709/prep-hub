@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!--
+  COMPONENT : Round 2 cash prizes (mweb)
+  WHAT      : "₹1.2L in cash prizes." section for mobile: full-width AIR 1 card, AIR 2 & 3 side by side, AIR 4–20 rows. Designed at 390px wide.
+  WHERE     : India AI Open mobile web, directly after the "Four steps." section (≤ 760px).
+  FILES     : this file + shared/r2-base.css + shared/r2-core.js (load the two shared files once per page).
+  PASTE     : 1) <link rel="stylesheet" href="shared/r2-base.css"> in <head>
+              2) the "Component CSS" block below into your stylesheet
+              3) the <section data-r2-root="cash-prizes-mweb"> … </section> markup
+              4) <script src="shared/r2-core.js"> once, then the "Component JS" block
+  CLASS PREFIXES : shared r2x-  ·  this component r2cpm-
+
+  JS API (window.R2CashPrizesMweb)
+    .open() / .show()        show the section
+    .close() / .hide()       hide the section
+    .isOpen()                boolean
+    .set({field: 'text'})    override any placeholder (see FIELDS)
+    .onView   = fn(api)      fires once when 35% of the section scrolls into view (analytics)
+    .onShow   = fn(api)      after .open()
+    .onHide   = fn(api)      after .close()
+    .onAction = fn(name, el, event)   click on any [data-r2-action] inside the section
+                                      (none in the current design; add data-r2-action="register" etc. to future CTAs/links;
+                                       data-r2-action="close" also hides the section)
+
+  CONFIG (top of the component script, all off by default)
+    ENABLE_DATE_WINDOW  false   show only between SHOW_FROM and SHOW_UNTIL (ISO dates, IST)
+    SHOW_FROM / SHOW_UNTIL      date window bounds
+    DISMISS_WITH_ESC    false   Esc hides the section (only useful if you turn this into an overlay)
+    VALUES              null    object of field overrides applied on load (same keys as .set)
+
+  FIELDS (backend placeholders, data-r2-field="…"; defaults = current design copy)
+    headlineAmount   "₹1.2L"
+    lead             "Round 2 is ranked on one overall leaderboard. The top 20 win cash."
+    prize1           "₹50,000"
+    prize2           "₹25,000"
+    prize3           "₹15,000"
+    tier1Range       "AIR 4–5"     tier1Amount "₹5,000"   tier1Winners "2 winners"
+    tier2Range       "AIR 6–10"    tier2Amount "₹2,000"   tier2Winners "5 winners"
+    tier3Range       "AIR 11–20"   tier3Amount "₹1,000"   tier3Winners "10 winners"
+    totalPool        "₹1,20,000"
+    (if you change amounts, also update the aria-label on the matching card)
+
+  HOOKS (data attributes)
+    data-r2-root="cash-prizes-mweb"   component root (query this)
+    data-r2-field="…"        backend-overridable text
+    data-r2-action="…"       click hook routed to .onAction (add to CTAs / links / close buttons)
+
+  ACCESSIBILITY
+    <section> is labelled by its <h2>; emoji and colour squares are aria-hidden; prize cards carry aria-labels.
+    No animation ships; shared CSS disables animation/transition under prefers-reduced-motion.
+    Emoji render with the device's emoji font, so they look slightly different per OS.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cash prizes — mweb</title>
+<link rel="stylesheet" href="shared/r2-base.css">
+<style>
+/* Demo page only — your site already provides this. */
+body{margin:0;background:#F6F7FB}
+/* ===== Component CSS (copy from here) ===== */
+.r2cpm-section{padding:64px 20px 56px}
+.r2cpm-lead{margin:14px 0 0;font-size:16px;line-height:1.5;color:#5A6478}
+.r2cpm-p1{margin-top:28px;border-radius:16px;padding:22px 20px;gap:22px}
+.r2cpm-top{display:flex;justify-content:space-between;align-items:flex-start}
+.r2cpm-bottom{display:flex;flex-direction:column;gap:8px}
+.r2cpm-num1{font-size:34px}
+.r2cpm-emoji1{font-size:40px}
+.r2cpm-amt1{font-size:52px;color:#fff}
+.r2cpm-winner{font-size:15px;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px}
+.r2cpm-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.r2cpm-p{border-radius:16px;padding:16px;gap:16px}
+.r2cpm-num{font-size:26px}
+.r2cpm-emoji{font-size:30px}
+.r2cpm-amt{font-size:30px}
+.r2cpm-pillrow{display:flex}
+.r2cpm-pill{font-size:12px}
+.r2cpm-tiers{margin-top:10px;background:#E3E6EE;border:1px solid #E3E6EE;border-radius:16px;display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.r2cpm-tier{background:#fff;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.r2cpm-tier-l{display:flex;flex-direction:column;gap:6px}
+.r2cpm-tier-label{font-size:12px}
+.r2cpm-sq{width:9px;height:9px}
+.r2cpm-tier-win{font-size:14px;color:#5A6478}
+.r2cpm-tier-amt{font-size:28px;white-space:nowrap}
+.r2cpm-each{font-size:13px}
+.r2cpm-foot{margin:16px 0 0;font-size:13px;line-height:1.5;color:#5A6478}
+/* ===== end component CSS ===== */
+</style>
+</head>
+<body>
+<section class="r2x-section r2cpm-section" data-r2-root="cash-prizes-mweb" aria-labelledby="r2cpm-h">
+  <div class="r2x-inner r2x-inner--m">
+    <div class="r2x-marker r2x-marker--m r2x-yellow" aria-hidden="true"></div>
+    <h2 id="r2cpm-h" class="r2x-h2 r2x-h2--m"><span data-r2-field="headlineAmount">₹1.2L</span> in cash prizes.</h2>
+    <p class="r2cpm-lead" data-r2-field="lead">Round 2 is ranked on one overall leaderboard. The top 20 win cash.</p>
+
+    <div class="r2x-card r2x-card--blue r2cpm-p1" role="group" aria-label="AIR 1, winner: ₹50,000">
+      <div class="r2cpm-top">
+        <span class="r2x-num r2x-num--gold r2cpm-num1" aria-hidden="true">01</span>
+        <span class="r2x-emoji r2cpm-emoji1" aria-hidden="true">🏆</span>
+      </div>
+      <div class="r2cpm-bottom">
+        <span class="r2x-amt r2cpm-amt1" data-r2-field="prize1">₹50,000</span>
+        <span class="r2cpm-winner"><span class="r2x-pill r2x-pill--gold">AIR 1</span>Winner</span>
+      </div>
+    </div>
+
+    <div class="r2cpm-pair" role="list">
+      <div class="r2x-card r2cpm-p" role="listitem" aria-label="AIR 2: ₹25,000">
+        <div class="r2cpm-top"><span class="r2x-num r2cpm-num" aria-hidden="true">02</span><span class="r2x-emoji r2cpm-emoji" aria-hidden="true">🥈</span></div>
+        <div class="r2cpm-bottom">
+          <span class="r2x-amt r2cpm-amt" data-r2-field="prize2">₹25,000</span>
+          <span class="r2cpm-pillrow"><span class="r2x-pill r2x-pill--blue r2cpm-pill">AIR 2</span></span>
+        </div>
+      </div>
+      <div class="r2x-card r2cpm-p" role="listitem" aria-label="AIR 3: ₹15,000">
+        <div class="r2cpm-top"><span class="r2x-num r2cpm-num" aria-hidden="true">03</span><span class="r2x-emoji r2cpm-emoji" aria-hidden="true">🥉</span></div>
+        <div class="r2cpm-bottom">
+          <span class="r2x-amt r2cpm-amt" data-r2-field="prize3">₹15,000</span>
+          <span class="r2cpm-pillrow"><span class="r2x-pill r2x-pill--blue r2cpm-pill">AIR 3</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="r2cpm-tiers" role="list">
+      <div class="r2cpm-tier" role="listitem">
+        <div class="r2cpm-tier-l">
+          <span class="r2x-tier r2cpm-tier-label"><span class="r2x-tier-sq r2cpm-sq r2x-yellow" aria-hidden="true"></span><span data-r2-field="tier1Range">AIR 4–5</span></span>
+          <span class="r2cpm-tier-win"><span aria-hidden="true">💰 </span><span data-r2-field="tier1Winners">2 winners</span></span>
+        </div>
+        <span class="r2x-amt r2cpm-tier-amt"><span data-r2-field="tier1Amount">₹5,000</span> <span class="r2x-each r2cpm-each">each</span></span>
+      </div>
+      <div class="r2cpm-tier" role="listitem">
+        <div class="r2cpm-tier-l">
+          <span class="r2x-tier r2cpm-tier-label"><span class="r2x-tier-sq r2cpm-sq r2x-green" aria-hidden="true"></span><span data-r2-field="tier2Range">AIR 6–10</span></span>
+          <span class="r2cpm-tier-win"><span aria-hidden="true">💰 </span><span data-r2-field="tier2Winners">5 winners</span></span>
+        </div>
+        <span class="r2x-amt r2cpm-tier-amt"><span data-r2-field="tier2Amount">₹2,000</span> <span class="r2x-each r2cpm-each">each</span></span>
+      </div>
+      <div class="r2cpm-tier" role="listitem">
+        <div class="r2cpm-tier-l">
+          <span class="r2x-tier r2cpm-tier-label"><span class="r2x-tier-sq r2cpm-sq r2x-pink" aria-hidden="true"></span><span data-r2-field="tier3Range">AIR 11–20</span></span>
+          <span class="r2cpm-tier-win"><span aria-hidden="true">💰 </span><span data-r2-field="tier3Winners">10 winners</span></span>
+        </div>
+        <span class="r2x-amt r2cpm-tier-amt"><span data-r2-field="tier3Amount">₹1,000</span> <span class="r2x-each r2cpm-each">each</span></span>
+      </div>
+    </div>
+
+    <p class="r2cpm-foot">One leaderboard across all tracks and levels. Total prize pool <span data-r2-field="totalPool">₹1,20,000</span>.</p>
+  </div>
+</section>
+<script src="shared/r2-core.js"></script>
+<script>
+/* ===== Component JS (copy from here) ===== */
+(function () {
+  var CONFIG = {
+    ENABLE_DATE_WINDOW: false,                     // true = only show between SHOW_FROM and SHOW_UNTIL
+    SHOW_FROM: '2026-11-09T00:00:00+05:30',        // registrations open
+    SHOW_UNTIL: '2027-01-11T23:59:59+05:30',       // final results
+    DISMISS_WITH_ESC: false,                       // inline section, so Esc does nothing by default
+    VALUES: null                                   // backend overrides, e.g. { prize1: '₹50,000', totalPool: '₹1,20,000' }
+  };
+  var root = document.querySelector('[data-r2-root="cash-prizes-mweb"]');
+  if (root && window.R2Core) R2Core.create('R2CashPrizesMweb', root, CONFIG);
+})();
+/* ===== end component JS ===== */
+</script>
+</body>
+</html>

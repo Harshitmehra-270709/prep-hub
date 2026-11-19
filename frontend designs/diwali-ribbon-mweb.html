@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--
+  AccioJob Diwali Offer: Global top ribbon (MWeb)
+  ------------------------------------------------------------
+  Replaces the blue global ribbon during the Diwali offer (6–12 Nov).
+
+  Paste the <style>, the .dwb-ribbon block and the <script> where your current ribbon sits.
+  Everything is scoped under .dwb-.
+
+  - "Claim" link: set the href on a[data-dwb-claim] (the Target-Role Readiness page).
+  - Close (×) hides the ribbon and remembers it for the session (sessionStorage).
+    Hook: DiwaliRibbon.onClose = function () { … };
+  - Date window: set ENFORCE_DATES = true in the script to show it only 6–12 Nov (IST).
+  - Animations (lights, diya flame) stop for users with reduced motion enabled.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diwali Ribbon (MWeb)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  .dwb-ribbon, .dwb-ribbon * { box-sizing: border-box; }
+  .dwb-ribbon {
+    position: relative; overflow: hidden; display: flex; align-items: center;
+    gap: 10px; padding: 9px 6px 11px 12px;
+    background: radial-gradient(circle at 10% 50%, rgba(255,182,39,.28), rgba(255,182,39,0) 40%), #0B1B3F;
+    border-bottom: 1.5px solid #E9B23F; color: #FFFFFF;
+    font-family: Inter, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased;
+  }
+  .dwb-ribbon[hidden] { display: none; }
+  .dwb-lights { position: absolute; left: 0; right: 0; bottom: 0; height: 8px; display: flex; justify-content: space-around; align-items: flex-end; padding: 0 8px; pointer-events: none; opacity: .85; }
+  .dwb-lights span { width: 4px; height: 4px; border-radius: 50%; animation: dwb-twinkle 1.6s ease-in-out infinite; }
+  .dwb-diya { position: relative; flex: none; width: 24px; height: 24px; }
+  .dwb-flame { position: absolute; left: 8px; top: 0; width: 8px; height: 12px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: radial-gradient(circle at 50% 70%, #FFF6C9 0%, #FFC94D 40%, #FF8A00 75%, rgba(255,138,0,0) 100%); filter: drop-shadow(0 0 5px rgba(255,180,40,.9)); transform-origin: 50% 100%; animation: dwb-flicker 1.2s ease-in-out infinite; }
+  .dwb-lamp { position: absolute; left: 1.5px; bottom: 1px; width: 21px; height: 10px; border-radius: 0 0 10.5px 10.5px; background: linear-gradient(#E0731F, #B8471A); box-shadow: inset 0 2px 0 #F2A03D; }
+  .dwb-free { color: #FFC94D; }
+  .dwb-was { color: #94A3B8; font-weight: 600; }
+  .dwb-close { position: relative; flex: none; width: 32px; height: 32px; border: none; border-radius: 8px; background: transparent; color: #FFFFFF; font-size: 16px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
+  .dwb-close:hover { background: rgba(255,255,255,.1); }
+  .dwb-text { position: relative; flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .dwb-tag { font-size: 8px; font-weight: 800; letter-spacing: .1em; color: #FFC94D; }
+  .dwb-msg { font-size: 11px; font-weight: 700; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dwb-claim { position: relative; flex: none; display: flex; align-items: center; height: 28px; padding: 0 10px; border-radius: 8px; background: #FFC94D; color: #0B1B3F; font-size: 11px; font-weight: 800; white-space: nowrap; text-decoration: none; }
+  .dwb-claim:hover { color: #0B1B3F; background: #FFD66E; text-decoration: none; }
+  @keyframes dwb-twinkle { 0%,100% { opacity: .35; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.1); } }
+  @keyframes dwb-flicker { 0%,100% { transform: scaleY(1); } 30% { transform: scaleY(1.15); } 60% { transform: scaleY(.9); } }
+  @media (prefers-reduced-motion: reduce) { .dwb-lights span, .dwb-flame { animation: none; } }
+</style>
+</head>
+<body style="margin:0">
+
+<div class="dwb-ribbon" id="dwb-ribbon" role="region" aria-label="Diwali offer">
+  <div class="dwb-lights" aria-hidden="true"></div>
+  <div class="dwb-diya" aria-hidden="true"><div class="dwb-flame"></div><div class="dwb-lamp"></div></div>
+  <div class="dwb-text">
+    <span class="dwb-tag">DIWALI SPECIAL · 6–12 NOV</span>
+    <span class="dwb-msg">Role Readiness Test <span class="dwb-free">FREE</span> <s class="dwb-was">₹199</s></span>
+  </div>
+  <a class="dwb-claim" href="#" data-dwb-claim>Claim →</a>
+  <button class="dwb-close" type="button" aria-label="Close" data-dwb-close>×</button>
+</div>
+
+<script>
+(function () {
+  var ENFORCE_DATES = false;
+  var START = '2026-11-06T00:00:00+05:30', END = '2026-11-12T23:59:59+05:30';
+  var KEY = 'dw_diwali_ribbon_closed';
+  var el = document.getElementById('dwb-ribbon');
+  if (!el) return;
+  var now = Date.now();
+  var closed = false; try { closed = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+  if (closed || (ENFORCE_DATES && (now < Date.parse(START) || now > Date.parse(END)))) { el.hidden = true; }
+  var COLS = ['#FFC94D', '#FF8A00', '#FF4D6D', '#7CF3C5', '#FFE08A'];
+  el.querySelector('.dwb-lights').innerHTML = Array.from({ length: 22 }, function (_, i) {
+    var c = COLS[i % 5];
+    return '<span style="background:' + c + ';box-shadow:0 0 6px 2px ' + c + ';animation-duration:' + (1.4 + (i % 4) * 0.3) + 's;animation-delay:' + ((i % 6) * 0.2) + 's;margin-bottom:' + (i % 2 ? 2 : 5) + 'px"></span>';
+  }).join('');
+  var API = window.DiwaliRibbon = {
+    show: function () { el.hidden = false; },
+    hide: function () { el.hidden = true; },
+    onClose: null
+  };
+  el.querySelector('[data-dwb-close]').addEventListener('click', function () {
+    el.hidden = true;
+    try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+    if (typeof API.onClose === 'function') API.onClose();
+  });
+})();
+</script>
+</body>
+</html>
