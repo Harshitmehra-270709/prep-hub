@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sample Resume Interview Report | AccioJob</title>
+  <link rel="icon" type="image/svg+xml" href="https://placement.acciojob.com/icon.svg?icon.2caah15xxxi-b.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="pages.css" />
+</head>
+<body data-nav="prep">
+  <div class="shell">
+    <main class="content" id="page"></main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="layout.js"></script>
+  <script src="data.js"></script>
+  <script src="api.js"></script>
+  <script>
+    const { icon, esc, crumbs } = UI;
+    const page = document.getElementById('page');
+    const sessionId = new URLSearchParams(location.search).get('session');
+
+    // Converts a backend report (backend/src/agents/evaluatorAgent.js) into the shape the
+    // sample uses, so one renderer serves both.
+    const AREA_ICONS = { introduction: 'i-user', projects: 'i-folder', experience: 'i-briefcase', internship: 'i-briefcase', skills: 'i-code' };
+    function fromBackend(rep) {
+      const d = rep.delivery || {};
+      const mins = Math.floor((d.spokenSeconds || 0) / 60), secs = (d.spokenSeconds || 0) % 60;
+      return {
+        verdict: rep.verdict,
+        headline: [rep.headline, ''],
+        summary: rep.summary,
+        oneLine: rep.oneLine,
+        score: rep.communicationScore,
+        scoreNote: rep.scoreNote,
+        metrics: rep.metrics.map((m) => [m.name, null, m.score, m.note]),
+        measured: [
+          ['Answers', d.answers],
+          ['Words per minute', d.wordsPerMinute ?? '—'],
+          ['Filler words', d.spokenSeconds ? `${d.fillerCount} in ${mins}m ${secs}s` : d.fillerCount],
+          ['Most used', (d.topFillers || []).map((f) => `“${f}”`).join(', ') || 'none'],
+        ],
+        tip: rep.tip,
+        areas: rep.areas.map((a) => [a.name, AREA_ICONS[a.name.toLowerCase().split(' ')[0]] || 'i-chat', a.questions, a.summary]),
+        fixes: rep.fixes.map((f) => [f.fix, f.why]),
+      };
+    }
+
+    const verdictClass = (v) => (v === 'Ready' ? 'verdict--ready' : v === 'Not ready' ? 'verdict--not' : '');
+
+    function render(r, { real }) {
+      page.innerHTML = `
+        ${crumbs(real
+          ? [['Job Preparation', 'index.html'], ['Your Report']]
+          : [['Job Preparation', 'index.html'], ['Resume Interview', 'resume-interview.html'], ['Sample Report']])}
+
+        <section class="verdict-card ${verdictClass(r.verdict)}">
+          <div class="tagline">${esc(r.verdict)}</div>
+          <h1>${esc(r.headline[0])}<span class="hl">${esc(r.headline[1])}</span></h1>
+          <p>${esc(r.summary)}</p>
+          <small>${esc(r.oneLine)}</small>
+        </section>
+
+        <section class="section-card">
+          <div class="came"><div class="icon-tile tint-blue">${icon('i-chat')}</div><h3>How you came across</h3></div>
+          <div class="metric metric--score">
+            <div class="name">Communication score <b>${Number(r.score)}/100</b></div>
+            <div class="bar"><i style="width:${Number(r.score)}%"></i></div>
+            <div class="m-note">${esc(r.scoreNote)}</div>
+          </div>
+          ${r.metrics.map(([n, sub, w, note]) => `
+            <div class="metric">
+              <div class="name">${esc(n)}${sub ? `<small>${esc(sub)}</small>` : ''}</div>
+              <div class="bar"><i style="width:${Number(w)}%"></i></div>
+              <div class="m-note">${esc(note)}</div>
+            </div>`).join('')}
+          ${r.measured ? `<div class="pills" style="margin-top:14px">${r.measured.map(([k, v]) => `<span><b>${esc(k)}:</b>&nbsp;${esc(v)}</span>`).join('')}</div>` : ''}
+          <div class="one-tip">${icon('i-bulb')}<span><b>One tip:</b> ${esc(r.tip)}</span></div>
+        </section>
+
+        <div class="eyebrow" style="margin-top:30px">Where it dug in</div>
+        ${r.areas.map(([n, ic, qn, txt]) => `
+          <div class="area">
+            <div class="icon-tile">${icon(ic)}</div>
+            <div style="flex:1"><h4>${esc(n)}<small>${Number(qn)} question${qn > 1 ? 's' : ''}</small></h4><p>${esc(txt)}</p></div>
+          </div>`).join('')}
+
+        <section class="fixes">
+          <div class="eyebrow">Your top 3 fixes</div>
+          ${r.fixes.map(([f, why], i) => `
+            <div class="fix"><b>${i + 1}</b><div><h4>${esc(f)}</h4><p><em>Why:</em> ${esc(why)}</p></div></div>`).join('')}
+        </section>
+
+        <div class="report-cta">
+          ${real
+            ? `<div><h4>Practice again</h4><p>Take another interview and see how your score moves.</p></div>
+               <a href="index.html" class="btn btn-primary">Back to Prep Hub ${icon('i-arrow')}</a>`
+            : `<div><h4>Get this report on your own resume</h4><p>A 15-minute AI interview and a full report — ₹49.</p></div>
+               <a href="resume-interview.html" class="btn btn-primary">Start your interview ${icon('i-arrow')}</a>`}
+        </div>`;
+    }
+
+    async function loadReal() {
+      page.innerHTML = `${crumbs([['Job Preparation', 'index.html'], ['Your Report']])}<div class="empty">Loading your report…</div>`;
+      try {
+        const session = await PrepAPI.getSession(sessionId);
+        const report = session.report || await PrepAPI.report(sessionId);
+        document.title = 'Your Interview Report | AccioJob';
+        render(fromBackend(report), { real: true });
+      } catch (err) {
+        page.innerHTML = `${crumbs([['Job Preparation', 'index.html'], ['Your Report']])}
+          <div class="callout" style="margin-top:10px">${icon('i-bulb')}<div><h4>Couldn't load this report</h4>
+          <p>${esc(err.message)} ${err.status === 404 ? 'Interview sessions are kept for two hours after they end.' : ''}</p></div></div>`;
+      }
+    }
+
+    if (sessionId) loadReal();
+    else render(SAMPLE_REPORT, { real: false });
+  </script>
+</body>
+</html>

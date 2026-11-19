@@ -1,0 +1,21 @@
+{
+  "name": "prep-hub-backend",
+  "version": "1.0.0",
+  "description": "Voice interview backend for Prep Hub: speech-to-text, text-to-speech, Claude-powered interview agents and a resilient provider layer.",
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=22.9"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "dev": "node --watch --env-file-if-exists=.env src/server.js",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "zod": "^4.6.7"
+  }
+}

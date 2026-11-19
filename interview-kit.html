@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Company Interview Handbooks - TCS, Infosys, Wipro & 30+ More | AccioJob</title>
+  <link rel="icon" type="image/svg+xml" href="https://placement.acciojob.com/icon.svg?icon.2caah15xxxi-b.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="pages.css" />
+</head>
+<body data-nav="prep">
+  <div class="shell">
+    <main class="content content--wide">
+      <nav class="crumbs"><a href="index.html">Job Preparation</a><svg><use href="#i-chevron"/></svg><span>Company Prep</span></nav>
+
+      <section class="kit-hero">
+        <div>
+          <span class="chip-sm chip-amber">Campus &amp; off-campus placement season 2026</span>
+          <h1 class="page-title">Prepare for <span class="hl">a specific company's</span> hiring process.</h1>
+          <p class="lead">Researched and compiled, round by round, from real students' interview experiences on YouTube, Glassdoor, Reddit, Leetcode Discuss and many more.</p>
+          <p class="lead-strong">Every handbook is free. Practice tests and AI interviews for each company from ₹79.</p>
+        </div>
+        <div class="navy-card">
+          <div class="eyebrow">What you get for every company</div>
+          <ul>
+            <li><i style="background:#f97316"></i>Handbook</li>
+            <li><i style="background:#3b82f6"></i>Practice Test</li>
+            <li><i style="background:#22c55e"></i>AI Interview</li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="search-row">
+        <label class="search"><svg><use href="#i-search"/></svg><input id="q" type="search" placeholder="Search a company — e.g. TCS, Amazon, Swiggy" autocomplete="off" /></label>
+        <button class="btn-navy" id="requestBtn">Request Interview Kit</button>
+      </div>
+
+      <div id="groups"></div>
+    </main>
+  </div>
+
+  <div class="modal" id="requestModal" hidden>
+    <div class="modal-card">
+      <button class="wa-close" data-close aria-label="Close">×</button>
+      <h3>Request an Interview Kit</h3>
+      <form id="requestForm">
+        <label>Company<input name="company" required placeholder="e.g. Deloitte" /></label>
+        <label>Role<input name="role" required placeholder="e.g. Analyst" /></label>
+        <button class="btn-block" type="submit">Send request</button>
+      </form>
+      <div class="done" hidden><b><svg><use href="#i-check"/></svg></b><h3>Request noted</h3><p>We'll let you know when this handbook is live.</p></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="layout.js"></script>
+  <script src="data.js"></script>
+  <script>
+    const { icon, esc } = UI;
+    const card = (c) => `
+      <a class="co-card" href="company.html?c=${c.slug}">
+        <div class="co-top">
+          <div class="co-logo"><img src="${c.logo}" alt="${esc(c.name)} logo" loading="lazy" /></div>
+          <div><div class="co-name">${esc(c.name)}</div><div class="co-role">${esc(c.role)}</div></div>
+        </div>
+        <div class="tags">${c.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join('')}<span class="tag">+${c.more}</span></div>
+        <span class="arrow-btn">${icon('i-arrow')}</span>
+      </a>`;
+
+    const season = `
+      <div class="season">
+        <div class="icon-tile">${icon('i-clock')}</div>
+        <div><h3>Placement season is on - campus &amp; off-campus</h3>
+        <p>TCS, Infosys, Wipro, Cognizant and other big companies hire from August to January, usually with only 7-14 days' notice before they start the process. That's not much time to prepare. Practicing early means you already know your weak areas - and have fixed them - before the companies start their process.</p></div>
+      </div>`;
+
+    function render(query = '') {
+      const q = query.trim().toLowerCase();
+      const match = (c) => !q || [c.name, c.role, ...c.tags].join(' ').toLowerCase().includes(q);
+      let html = '';
+      COMPANY_GROUPS.forEach((g, i) => {
+        const list = COMPANIES.filter((c) => c.group === g.name && match(c));
+        if (list.length) {
+          html += `<section class="group">
+            <div class="group-head"><div class="icon-tile icon-tile--blue">${icon(g.icon)}</div><h2>${g.name}</h2><span class="count-pill">${list.length} handbook${list.length > 1 ? 's' : ''}</span></div>
+            <div class="grid-3">${list.map(card).join('')}</div></section>`;
+        }
+        if (i === 0 && !q) html += season;
+      });
+      document.getElementById('groups').innerHTML = html ||
+        `<div class="empty">No handbook for “${esc(query)}” yet. <a href="#" class="hl" onclick="openReq(event)">Request it →</a></div>`;
+    }
+    document.getElementById('q').addEventListener('input', (e) => render(e.target.value));
+    render();
+
+    // Request modal (front-end only)
+    const modal = document.getElementById('requestModal');
+    const form = document.getElementById('requestForm');
+    window.openReq = (e) => { e && e.preventDefault(); form.hidden = false; modal.querySelector('.done').hidden = true; form.company.value = document.getElementById('q').value; modal.hidden = false; };
+    document.getElementById('requestBtn').addEventListener('click', openReq);
+    modal.addEventListener('click', (e) => { if (e.target === modal || e.target.hasAttribute('data-close')) modal.hidden = true; });
+    form.addEventListener('submit', (e) => { e.preventDefault(); form.hidden = true; modal.querySelector('.done').hidden = false; form.reset(); });
+  </script>
+</body>
+</html>

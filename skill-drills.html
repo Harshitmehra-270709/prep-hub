@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skill Check - Acciojob Placement Services</title>
+  <link rel="icon" type="image/svg+xml" href="https://placement.acciojob.com/icon.svg?icon.2caah15xxxi-b.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="pages.css" />
+</head>
+<body data-nav="prep">
+  <div class="shell">
+    <main class="content content--wide">
+      <nav class="crumbs"><a href="index.html">Job Preparation</a><svg><use href="#i-chevron"/></svg><span>Skill Check</span></nav>
+      <span class="chip-sm"><svg><use href="#i-chart"/></svg>Skill check</span>
+      <h1 class="page-title page-title--sm">Sharpen one skill — <span class="hl">see where you actually stand.</span></h1>
+
+      <div class="search-row">
+        <label class="search"><svg><use href="#i-search"/></svg><input id="q" type="search" placeholder="Search a skill — e.g. SQL, React, DSA" autocomplete="off" /></label>
+      </div>
+      <div class="filters" id="filters"></div>
+      <div class="grid-3" id="skills"></div>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="layout.js"></script>
+  <script src="data.js"></script>
+  <script>
+    const { icon, esc } = UI;
+    let cat = 'All';
+    const counts = SKILLS.reduce((m, s) => (m[s.cat] = (m[s.cat] || 0) + 1, m), {});
+    const cats = ['All', ...Object.keys(SKILL_CATS)];
+
+    function renderFilters() {
+      document.getElementById('filters').innerHTML = cats.map((c) =>
+        `<button class="filter${c === cat ? ' on' : ''}" data-cat="${c}">${c}<small>${c === 'All' ? SKILLS.length : counts[c]}</small></button>`).join('');
+    }
+    const pkgStrip = `<div class="pkg-strip">
+        <div class="icon-tile icon-tile--glass">${icon('i-infinity')}</div>
+        <b>Job Preparation Package</b><span class="chip-off">75% OFF</span>
+        <span class="muted">All 30+ skill checks, unlimited, for 6 months · ₹1299</span>
+        <a href="index.html#package">Get the package ${icon('i-arrow')}</a></div>`;
+
+    function renderSkills() {
+      const q = document.getElementById('q').value.trim().toLowerCase();
+      const list = SKILLS.filter((s) => (cat === 'All' || s.cat === cat) && (!q || (s.name + ' ' + s.cat + ' ' + s.topic).toLowerCase().includes(q)));
+      const cards = list.map((s) => {
+        const c = SKILL_CATS[s.cat];
+        return `<a href="?skill=${s.slug}" data-skill="${s.slug}" class="skill-card" style="background:${c.bg};border-color:${c.bd}">
+          <div class="co-top"><div class="icon-tile" style="background:${c.tile}">${icon(c.icon)}</div>
+          <div><h3>${esc(s.name)}</h3><div class="cat" style="color:${c.tile}">${s.cat}</div></div></div>
+          <div class="skill-foot">
+            ${s.levels.length > 1 ? `<span class="levels">${s.levels.length} levels</span>` : ''}
+            <span class="tag">${esc(s.topic)}</span><span class="more">+${s.more} more</span>
+            <span class="arrow-btn">${icon('i-arrow')}</span>
+          </div></a>`;
+      });
+      if (cards.length > 6) cards.splice(6, 0, pkgStrip);
+      document.getElementById('skills').innerHTML = cards.join('') || `<div class="empty" style="grid-column:1/-1">No skill matches “${esc(q)}”.</div>`;
+    }
+
+    document.getElementById('filters').addEventListener('click', (e) => {
+      const b = e.target.closest('.filter'); if (!b) return;
+      cat = b.dataset.cat; renderFilters(); renderSkills();
+    });
+    document.getElementById('q').addEventListener('input', renderSkills);
+    renderFilters(); renderSkills();
+
+    /* ---------- Skill detail drawer (same pattern as the live site) ---------- */
+    document.body.insertAdjacentHTML('beforeend', '<div class="drawer-scrim" id="drScrim"></div><aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Skill details"></aside>');
+    const drawer = document.getElementById('drawer');
+    let current = null, levelIdx = 0;
+    const FORMAT_ICON = { 'Multiple-Choice Questions': 'i-check', 'Coding Problems': 'i-code', 'Pseudo-Code': 'i-file', 'AI Interview': 'i-mic',
+      'Subjective Questions': 'i-chat', 'SQL Queries': 'i-database', 'Voice Based Questions': 'i-mic' };
+
+    function about(s, lv) {
+      const label = lv.level ? `${s.name} (${lv.level})` : s.name;
+      const hasAI = lv.format.includes('AI Interview');
+      return `This Skill Drill tests your command of ${esc(label)} — specifically ${s.topics.slice(0, 4).map(esc).join(', ')}.`
+        + (lv.level ? ` This drill is pitched at the ${lv.level} level.` : '')
+        + (hasAI ? " After completing the test, you'll go through an AI-powered interview that asks dynamic follow-up questions based on your answers, giving you a realistic interview experience." : '')
+        + " Once you complete it, you'll receive a detailed performance report on your registered email, highlighting your strengths and areas to improve.";
+    }
+
+    function renderDrawer() {
+      const s = current, c = SKILL_CATS[s.cat], lv = s.levels[levelIdx];
+      drawer.innerHTML = `
+        <button class="wa-close" id="drClose" aria-label="Close">×</button>
+        <div class="dr-head">
+          <div class="icon-tile" style="background:${c.tile}">${icon(c.icon)}</div>
+          <div><h3>${esc(s.name)}</h3><div class="cat" style="color:${c.tile}">${s.cat}</div></div>
+          <span class="dr-time">${icon('i-clock')}${lv.minutes} min</span>
+        </div>
+        ${s.levels.length > 1 ? `<div class="seg" id="drLevels">${s.levels.map((l, i) => `<button class="${i === levelIdx ? 'on' : ''}" data-level="${i}">${l.level}</button>`).join('')}</div>` : ''}
+        <p class="dr-about">${about(s, lv)}</p>
+        <div class="hb-label">What it covers</div>
+        <div class="dr-chips">${s.topics.map((t) => `<span style="background:${c.bg};color:${c.tile};border:1px solid ${c.bd}">${esc(t)}</span>`).join('')}</div>
+        <div class="hb-label">Test format</div>
+        <ul class="dr-format">${lv.format.map((f) => `<li>${icon(FORMAT_ICON[f] || 'i-check')}${f}</li>`).join('')}</ul>
+        <a href="sample-report.html" class="hl" style="font-weight:700;font-size:13.5px">View a sample report ↗</a>
+        <div class="pkg-box">
+          <div class="pkg-box-h">${icon('i-check')}Included in the Job Preparation Package</div>
+          <button class="pkg-row" data-start="0">Practice Test<span>Start ${icon('i-arrow')}</span></button>
+          <button class="pkg-row" data-start="1">Practice Test + AI Interview<span>Start ${icon('i-arrow')}</span></button>
+          <a class="pkg-link" href="index.html#package">All 30+ skill checks for ₹1299 · 75% OFF →</a>
+        </div>`;
+    }
+
+    function openSkill(slug, push = true) {
+      const s = SKILLS.find((x) => x.slug === slug);
+      if (!s) return;
+      current = s; levelIdx = 0;
+      renderDrawer();
+      document.body.classList.add('drawer-open');
+      if (push) history.replaceState(null, '', '?skill=' + slug);
+      document.getElementById('drClose').focus();
+    }
+    function closeSkill() {
+      document.body.classList.remove('drawer-open');
+      history.replaceState(null, '', location.pathname);
+    }
+
+    document.getElementById('skills').addEventListener('click', (e) => {
+      const card = e.target.closest('[data-skill]');
+      if (card) { e.preventDefault(); openSkill(card.dataset.skill); }
+    });
+    document.getElementById('drScrim').addEventListener('click', closeSkill);
+    // capture phase: runs before layout.js closes the start sheet, so Escape closes only the top-most layer
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.getElementById('startModal').hidden) closeSkill(); }, true);
+    drawer.addEventListener('click', (e) => {
+      if (e.target.closest('#drClose')) return closeSkill();
+      const lb = e.target.closest('[data-level]');
+      if (lb) { levelIdx = +lb.dataset.level; renderDrawer(); return; }
+      const st = e.target.closest('[data-start]');
+      if (st) {
+        const lv = current.levels[levelIdx];
+        const ai = st.dataset.start === '1';
+        const fmt = lv.format.filter((f) => f !== 'AI Interview');
+        const label = `${current.name}${lv.level ? ' (' + lv.level + ')' : ''}`;
+        UI.startTest({
+          title: `${label} — Skill Drill${ai ? ' + AI Interview' : ''}`,
+          minutes: lv.minutes,
+          parts: ai ? fmt.concat('AI interview') : fmt,
+          ai,
+          href: ai ? UI.interviewUrl({ mode: 'skill', role: label, topics: current.topics, title: `${label} — AI Skill Interview`, back: `skill-drills.html?skill=${current.slug}` }) : null,
+        });
+      }
+    });
+
+    const deep = new URLSearchParams(location.search).get('skill');
+    if (deep) openSkill(deep, false);
+  </script>
+</body>
+</html>

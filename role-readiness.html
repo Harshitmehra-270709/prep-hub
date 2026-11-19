@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Role Readiness Check - Acciojob Placement Services</title>
+  <link rel="icon" type="image/svg+xml" href="https://placement.acciojob.com/icon.svg?icon.2caah15xxxi-b.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="pages.css" />
+</head>
+<body data-nav="prep">
+  <div class="shell">
+    <main class="content content--wide">
+      <nav class="crumbs"><a href="index.html">Job Preparation</a><svg><use href="#i-chevron"/></svg><span>Role Readiness Check</span></nav>
+      <span class="chip-sm"><svg><use href="#i-target"/></svg>Role readiness check</span>
+      <h1 class="page-title page-title--sm">Pick your target role. Find out <span class="hl">how ready you actually are.</span></h1>
+
+      <div class="grid-3 role-grid" id="roles"></div>
+
+      <div class="pkg-strip">
+        <div class="icon-tile icon-tile--glass"><svg><use href="#i-infinity"/></svg></div>
+        <b>Job Preparation Package</b><span class="chip-off">75% OFF</span>
+        <span class="muted">All 10+ role readiness tests, unlimited, for 6 months · ₹1299</span>
+        <a href="index.html#package">Get the package <svg><use href="#i-arrow"/></svg></a>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="layout.js"></script>
+  <script src="data.js"></script>
+  <script>
+    const { icon, esc } = UI;
+    document.getElementById('roles').innerHTML = ROLES.map((r) => `
+      <a href="role.html?r=${r.slug}" class="role-card" style="background:${r.bg};border-color:${r.bd}">
+        <div class="co-top">
+          <div class="icon-tile" style="background:${r.tile}">${icon(r.icon)}</div>
+          <div><h3>${r.name}</h3><div class="q">Am I ready for ${r.name}?</div></div>
+        </div>
+        <div class="tags">${r.skills.map((s) => `<span class="tag">${esc(s)}</span>`).join('')}<span class="tag tag--more">+${r.more} more</span></div>
+        <div class="role-foot">
+          <div class="role-meta">
+            ${r.track ? `<span class="r-track">${icon('i-code')}${r.track}</span>` : ''}
+            <span>${icon('i-layers')}${r.count} skills tested</span>
+          </div>
+          <span class="arrow-btn">${icon('i-arrow')}</span>
+        </div>
+      </a>`).join('');
+  </script>
+</body>
+</html>
